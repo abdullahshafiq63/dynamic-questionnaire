@@ -1,30 +1,28 @@
 import React, { useState } from "react";
 import { Avatar, Button, List } from "antd";
 import End from "./end";
-
-interface Answer {
-  question: any;
-  answer: string;
-}
+import { Answer } from "../interfaces/common";
 
 interface HistoryProps {
-  answers: Answer[];
+  attempts: Answer[][];
 }
 
-export const History: React.FC<HistoryProps> = ({ attempts }: any) => {
-  const [activeComponent, setActiveComponet] = useState("list");
-  const [selectedAttempt, setSelectedAttemp] = useState(null);
+export const History: React.FC<HistoryProps> = ({ attempts }) => {
+  const [activeComponent, setActiveComponet] = useState<string>("list");
+  const [selectedAttempt, setSelectedAttemp] = useState<Answer[]>([]);
 
-  const handleItemClick = (item: any) => {
+  const handleItemClick = (item: Answer[]) => {
     setSelectedAttemp(item);
     setActiveComponet("detail");
   };
 
   return (
-    <div>
+    <div className="bg-white shadow-md rounded-lg border-blue-300 pl-8 pt-8 pb-4">
       {activeComponent === "list" && (
         <>
-          <h1 className="text-4xl text-bold">History of Questions and Answers</h1>
+          <h1 className="text-4xl text-bold">
+            History of Questions and Answers
+          </h1>
           <List
             itemLayout="horizontal"
             dataSource={attempts}
@@ -46,7 +44,7 @@ export const History: React.FC<HistoryProps> = ({ attempts }: any) => {
       )}
       {activeComponent === "detail" && (
         <>
-          <Button type="primary" onClick={() => setActiveComponet("list")}>
+          <Button type="primary" onClick={(): void => setActiveComponet("list")}>
             Back to History
           </Button>
           <End answers={selectedAttempt} />

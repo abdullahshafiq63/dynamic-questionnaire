@@ -2,13 +2,21 @@ import React, { useEffect, useState } from "react";
 import { Button } from "antd";
 import { Question } from "./question";
 import End from "./end";
+import { QuestionData, Answer } from "../interfaces/common";
 
-export const Questionnaire: React.FC = ({
+export interface QuestionnaireProps {
+  questions: QuestionData[];
+  attemptComplete: (answers: Answer[]) => void;
+}
+
+export const Questionnaire: React.FC<QuestionnaireProps> = ({
   questions,
   attemptComplete,
-}: any) => {
-  const [currentQuestion, setCurrentQuestion] = useState(questions[0]);
-  const [answers, setAnswers] = useState<any>([]);
+}) => {
+  const [currentQuestion, setCurrentQuestion] = useState<
+    QuestionData | undefined
+  >(questions[0]);
+  const [answers, setAnswers] = useState<Answer[]>([]);
 
   useEffect(() => {
     if (currentQuestion === undefined) {
@@ -17,30 +25,30 @@ export const Questionnaire: React.FC = ({
   }, [currentQuestion]);
 
   const deleteAnswer = (id: number) => {
-    const newAnswers = answers.filter((e: any) => e.question.id !== id);
+    const newAnswers = answers.filter((e: Answer) => e.question.id !== id);
     setAnswers([...newAnswers]);
   };
 
-  const addAnswer = (answer: any) => {
-    const newAnswers = [
+  const addAnswer = (answer: string) => {
+    const newAnswers: Answer[] = [
       ...answers,
-      { question: currentQuestion, answer: answer },
+      { question: currentQuestion as QuestionData, answer: answer },
     ];
     setAnswers(newAnswers);
   };
 
-  const findQuestion = (id: number) => {
-    return questions.find((e: any) => e.id === id);
+  const findQuestion = (id: number): QuestionData | undefined => {
+    return questions.find((e: QuestionData) => e.id === id);
   };
 
   const checkRules = (answer: string): number | undefined => {
-    if (currentQuestion.type === "boolean") {
+    if (currentQuestion?.type === "boolean") {
       if (answer === "Yes") {
         return currentQuestion.rules.yes;
       } else if (answer === "No") {
         return currentQuestion.rules.no;
       }
-    } else if (currentQuestion.type === "text") {
+    } else if (currentQuestion?.type === "text" && currentQuestion.rules.val) {
       if (+answer > currentQuestion.rules.val) {
         return currentQuestion.rules.yes;
       } else {
@@ -49,13 +57,13 @@ export const Questionnaire: React.FC = ({
     }
   };
 
-  const handleAnswer = (type: string, answer: string) => {
-    if (type === "Back") {
+  const handleAnswer = (type: string, value?: string): void => {
+    if (type === "Back" && currentQuestion) {
       deleteAnswer(currentQuestion.id - 1);
       setCurrentQuestion(findQuestion(currentQuestion.id - 1));
-    } else if (type === "Next") {
-      const nextQuesId: number | undefined = checkRules(answer);
-      addAnswer(answer);
+    } else if (type === "Next" && value) {
+      const nextQuesId: number | undefined = checkRules(value);
+      addAnswer(value);
       setCurrentQuestion(nextQuesId ? findQuestion(nextQuesId) : undefined);
     }
   };
@@ -67,6 +75,7 @@ export const Questionnaire: React.FC = ({
       ) : (
         <>
           <Button
+            className="py-4"
             type="primary"
             onClick={() => {
               setAnswers([]);

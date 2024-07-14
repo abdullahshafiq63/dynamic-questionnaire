@@ -5,9 +5,11 @@ import { Layout, Menu } from "antd";
 import { Questionnaire } from "./components/questionnaire";
 import { History } from "./components/history";
 
+import { QuestionData, Menuitem, Answer } from "./interfaces/common";
+
 const { Header, Content } = Layout;
 
-const items = [
+const items: Menuitem[] = [
   {
     key: "questions",
     label: "Questions",
@@ -18,7 +20,7 @@ const items = [
   },
 ];
 
-const data: any = [
+const data: QuestionData[] = [
   {
     id: 1,
     question: "Does your business operate in CA?",
@@ -77,8 +79,8 @@ const data: any = [
 ];
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("questions");
-  const [attempts, setAttempts] = useState([]);
+  const [activeTab, setActiveTab] = useState<string>("questions");
+  const [attempts, setAttempts] = useState<Answer[][]>([]);
   return (
     <Layout className="h-screen">
       <Header>
@@ -87,7 +89,7 @@ const App: React.FC = () => {
           mode="horizontal"
           defaultSelectedKeys={["questions"]}
           items={items}
-          onSelect={(item) => {
+          onSelect={(item): void => {
             setActiveTab(item.key);
           }}
         />
@@ -96,7 +98,7 @@ const App: React.FC = () => {
         {activeTab === "questions" ? (
           <Questionnaire
             questions={data}
-            attemptComplete={(attempt: any) => {
+            attemptComplete={(attempt: Answer[]): void => {
               setAttempts([...attempts, attempt]);
             }}
           />
